@@ -1,0 +1,79 @@
+@import 'variables';
+@import 'mixins';
+@import 'globals';
+
+
+nav {
+    background: $primary-color;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+
+    a {
+        color: white;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    button {
+        background: none;
+        border: 1px solid white;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: $border-radius;
+        cursor: pointer;
+
+        &:hover {
+            background: white;
+            color: $primary-color;
+        }
+    }
+}
+
+form {
+    @include flex-center;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 400px;
+    margin: 2rem auto;
+    @include card;
+
+    input {
+        padding: 0.5rem;
+        border: 1px solid $input-border;
+        border-radius: $border-radius;
+        width: 100%;
+        background: $input-bg;
+
+        &:focus {
+            outline: none;
+            border-color: $primary-color;
+        }
+    }
+
+    button {
+        background: $primary-color;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: $border-radius;
+        cursor: pointer;
+
+        &:hover {
+            background: $button-hover;
+        }
+    }
+}
+
+
+.dashboard {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    @include card;
+    text-align: center;
+}
