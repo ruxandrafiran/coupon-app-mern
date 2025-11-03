@@ -1,6 +1,6 @@
-@import 'variables';
-@import 'mixins';
-@import 'globals';
+@use 'variables' as *;
+@use 'mixins' as *;
+@use 'globals' as *;
 
 
 nav {
