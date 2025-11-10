@@ -14,7 +14,11 @@ const ProtectedRoute = ({ user, children }) => {
 };
 
 export default function App() {
-    const { user } = useContext(AuthContext);
+    const { user, loading } = useContext(AuthContext);
+
+    if (loading) {
+        return <p>Loading...</p>;
+    }
 
     return (
         <BrowserRouter>
