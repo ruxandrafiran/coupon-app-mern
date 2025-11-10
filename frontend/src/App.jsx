@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Navbar from "./components/Navbar";
+import { AuthContext } from "./context/AuthContext";
 import "./styles/main.scss";
 
 const Dashboard = () => <h2>Dashboard</h2>;
-
 
 const ProtectedRoute = ({ user, children }) => {
     if (!user) return <Navigate to="/login" />;
@@ -14,7 +14,7 @@ const ProtectedRoute = ({ user, children }) => {
 };
 
 export default function App() {
-    const user = JSON.parse(localStorage.getItem("user"));
+    const { user } = useContext(AuthContext);
 
     return (
         <BrowserRouter>

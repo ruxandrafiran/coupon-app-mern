@@ -7,15 +7,16 @@ const generateToken = (id) => {
 };
 
 export const registerUser = async (req, res) => {
-    const { email, password } = req.body;
+    let { username, password } = req.body;
+    username = username.trim();
     try {
-        const userExists = await User.findOne({ email });
+        const userExists = await User.findOne({ username });
         if (userExists) return res.status(400).json({ message: "User already exists" });
 
-        const user = await User.create({ email, password });
+        const user = await User.create({ username, password });
         res.status(201).json({
             _id: user._id,
-            email: user.email,
+            username: user.username,
             token: generateToken(user._id),
         });
     } catch (err) {
@@ -24,17 +25,18 @@ export const registerUser = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-    const { email, password } = req.body;
+    let { username, password } = req.body;
+    username = username.trim();
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ username });
         if (user && (await user.matchPassword(password))) {
             res.json({
                 _id: user._id,
-                email: user.email,
+                username: user.username,
                 token: generateToken(user._id),
             });
         } else {
-            res.status(401).json({ message: "Invalid email or password" });
+            res.status(401).json({ message: "Invalid username or password" });
         }
     } catch (err) {
         res.status(500).json({ message: "Error logging in" });
