@@ -1,14 +1,18 @@
-import React from "react";
 import axios from "axios";
 
-const API = axios.create({
-    baseURL: "http://localhost:5000/api", 
+const api = axios.create({
+    baseURL: "http://localhost:5000/api",
 });
 
-API.interceptors.request.use((req) => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user?.token) req.headers.Authorization = `Bearer ${user.token}`;
-    return req;
+api.interceptors.request.use((config) => {
+    const raw = localStorage.getItem("user");
+    if (raw) {
+        const user = JSON.parse(raw);
+        if (user?.token) {
+            config.headers.Authorization = `Bearer ${user.token}`;
+        }
+    }
+    return config;
 });
 
-export default API;
+export default api;

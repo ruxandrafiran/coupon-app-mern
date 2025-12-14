@@ -6,6 +6,8 @@ import Navbar from "./components/Navbar";
 import LocationPage from "./pages/LocationPage";
 import { AuthContext } from "./context/AuthContext";
 import "./styles/main.scss";
+//mport Dashboard from "./pages/Dashboard";
+
 
 const Dashboard = () => <h2>Dashboard</h2>;
 

@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import "../styles/main.scss";
+import AddCouponForm from "../components/AddCouponForm";
+import { getCouponsByPlace, createCoupon } from "../api/coupons";
 
-const LocationPage = () => {
+export default function LocationPage() {
     const { placeId } = useParams();
     const [location, setLocation] = useState(null);
+    const [coupons, setCoupons] = useState([]);
+    const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
         if (!placeId || !window.google) return;
@@ -24,63 +27,71 @@ const LocationPage = () => {
                     "rating",
                     "opening_hours",
                     "geometry",
-                    "types"
+                    "types",
                 ],
             },
             (place, status) => {
                 if (status === window.google.maps.places.PlacesServiceStatus.OK) {
                     setLocation(place);
-                } else {
-                    console.error("Error fetching place details:", status);
                 }
             }
         );
     }, [placeId]);
 
-    if (!location) return <p className="loading">Loading...</p>;
+    useEffect(() => {
+        if (!placeId) return;
+        getCouponsByPlace(placeId).then((res) => {
+            setCoupons(res.data);
+        });
+    }, [placeId]);
+
+    const handleCreateCoupon = (data) => {
+        createCoupon({
+            ...data,
+            placeTypes: location?.types || []
+        }).then(() => {
+            setShowForm(false);
+            getCouponsByPlace(placeId).then((res) => setCoupons(res.data));
+        });
+    };
+
+    if (!location) return <div>Loading...</div>;
 
     return (
         <div className="location-page">
-            <h2 className="location-name">{location.name}</h2>
-            <p className="location-address">Address: {location.formatted_address}</p>
+            <h2>{location.name}</h2>
+            <p>{location.formatted_address}</p>
 
-            {location.formatted_phone_number && (
-                <p className="location-phone">
-                    Phone: {location.formatted_phone_number}
-                </p>
+            <button onClick={() => setShowForm(!showForm)}>
+                {showForm ? "Cancel" : "Add coupon"}
+            </button>
+
+            {showForm && (
+                <AddCouponForm
+                    placeId={placeId}
+                    placeName={location.name}
+                    placeAddress={location.formatted_address}
+                    onSubmit={handleCreateCoupon}
+                />
             )}
 
-            {location.website && (
-                <p className="location-website">
-                    Website:{" "}
-                    <a
-                        href={location.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        {location.website}
-                    </a>
-                </p>
-            )}
+            <h3>Coupons</h3>
 
-            {location.rating && (
-                <p className="location-rating">Rating: {location.rating}</p>
-            )}
+            {coupons.length === 0 && <p>No coupons yet for this place.</p>}
 
-            {location.opening_hours && location.opening_hours.weekday_text && (
-                <div className="location-hours">
-                    <h4>Hours:</h4>
-                    <ul>
-                        {location.opening_hours.weekday_text.map((day, i) => (
-                            <li key={i}>{day}</li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-
-            <button className="add-coupon-btn">Add Coupon</button>
+            <div className="coupon-list">
+                {coupons.map((c) => (
+                    <div key={c._id} className="coupon-card">
+                        <h4>
+                            {c.discountType === "percent"
+                                ? `${c.discountValue}% off`
+                                : `${c.discountValue} lei off`}
+                        </h4>
+                        <p>Expires: {new Date(c.expiresAt).toLocaleDateString()}</p>
+                        {c.description && <p>{c.description}</p>}
+                    </div>
+                ))}
+            </div>
         </div>
     );
-};
-
-export default LocationPage;
+}
