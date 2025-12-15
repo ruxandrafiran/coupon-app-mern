@@ -1,41 +1,48 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { loadGoogleMaps } from "../utils/loadGoogleMaps";
 
 const allowedTypes = ["restaurant", "cafe", "store", "bar", "supermarket"];
 
-const SearchBar = ({ onPlaceSelected }) => {
+const SearchBar = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const autocompleteServiceRef = useRef(null);
-    const navigate = useNavigate();
-    const location = useLocation(); 
 
-    const initService = () => {
-        if (!autocompleteServiceRef.current && window.google) {
-            autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService();
-        }
-    };
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         setSearchTerm("");
         setSuggestions([]);
     }, [location.pathname]);
 
-    const handleInputChange = (e) => {
+    const ensureService = async () => {
+        if (autocompleteServiceRef.current) return;
+
+        const g = await loadGoogleMaps();
+        autocompleteServiceRef.current =
+            new g.maps.places.AutocompleteService();
+    };
+
+    const handleInputChange = async (e) => {
         const value = e.target.value;
         setSearchTerm(value);
 
-        if (!value || !autocompleteServiceRef.current) {
+        if (!value) {
             setSuggestions([]);
             return;
         }
+
+        await ensureService();
+        if (!autocompleteServiceRef.current) return;
 
         autocompleteServiceRef.current.getPlacePredictions(
             { input: value, types: ["establishment"] },
             (predictions, status) => {
                 if (
                     status === window.google.maps.places.PlacesServiceStatus.OK &&
-                    predictions
+                    Array.isArray(predictions)
                 ) {
                     const filtered = predictions.filter((p) =>
                         p.types?.some((t) => allowedTypes.includes(t))
@@ -62,8 +69,8 @@ const SearchBar = ({ onPlaceSelected }) => {
                 onChange={handleInputChange}
                 placeholder="Search for locations..."
                 className="autocomplete-input"
-                onFocus={initService}
             />
+
             {suggestions.length > 0 && (
                 <ul className="autocomplete-suggestions">
                     {suggestions.map((s) => (

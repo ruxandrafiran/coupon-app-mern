@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 export default function AddCouponForm({ placeId, placeName, placeAddress, onSubmit }) {
     const [discountType, setDiscountType] = useState("percent");
