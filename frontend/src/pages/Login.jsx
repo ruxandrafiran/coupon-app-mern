@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useContext } from "react";
 import API from "../api/api";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
     const [username, setUsername] = useState("");
@@ -27,6 +27,7 @@ const Login = () => {
             <form onSubmit={handleSubmit}>
                 <input type="text" placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required />
                 <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+                <Link className="auth-switch-link" to="/register">Register</Link>
                 <button type="submit">Login</button>
             </form>
         </div>

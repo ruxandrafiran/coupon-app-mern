@@ -6,10 +6,9 @@ import Navbar from "./components/Navbar";
 import LocationPage from "./pages/LocationPage";
 import { AuthContext } from "./context/AuthContext";
 import "./styles/main.scss";
-//mport Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard";
 
 
-const Dashboard = () => <h2>Dashboard</h2>;
 
 const ProtectedRoute = ({ user, children }) => {
     if (!user) return <Navigate to="/login" />;
